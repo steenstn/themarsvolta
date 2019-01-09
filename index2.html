@@ -1,0 +1,1001 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <title>Back To The Studio - The Mars Volta Adventure</title>
+  <style>
+    body {
+      margin:0px;
+      padding:0px;
+      text-align:center;
+      background-color: #000;
+    }
+	
+	.contact {
+	  position: absolute;
+	  bottom: 10px;
+	}
+	
+	a {
+	  font-size:12px;
+	  font-family:Verdana;
+	  color:#afafaf;
+	}
+	
+	a:hover {
+	  color: #fff;
+	}
+
+    canvas{
+      outline:0;
+      border:1px solid #666;
+  	  image-rendering: optimizeSpeed;             /* Older versions of FF          */
+  	  image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+  	  image-rendering: -webkit-optimize-contrast; /* Safari                        */
+  	  image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+  	  image-rendering: pixelated;                 /* Awesome future-browsers       */
+  	  -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+  	  transform:scale(2);
+  	  transform-origin: top;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top:30px;
+    }
+  </style>
+</head>
+<body>
+
+<script src="js/GameState.js" type ="text/javascript"></script>
+<script>
+var d = new Date();
+var isDecember = d.getMonth() === 11;
+GameState.christmasMode = isDecember ? true : false;
+</script>
+<script src="js/Vector.js" type="text/javascript"></script>
+<script src="js/gui/GUIRenderable.js" type="text/javascript"></script>
+<script src="js/gui/PlayerHealthBar.js" type="text/javascript"></script>
+<script src="js/gui/BossHealthBar.js" type="text/javascript"></script>
+<script src="js/Level.js" type="text/javascript"></script>
+<script src="js/LevelTile.js" type="text/javascript"></script>
+<script src="js/Viewport.js" type="text/javascript"></script>
+<script src="js/Player.js" type="text/javascript"></script>
+<script src="js/Jukebox.js" type="text/javascript"></script>
+<script src="js/Background.js" type="text/javascript"></script>
+<script src="js/WorldConstants.js" type="text/javascript"></script>
+<script src ="js/particles/Snowflake.js" type="text/javascript"></script>
+<script src ="js/particles/IntroStar.js" type="text/javascript"></script>
+<script src="js/particles/Particle.js" type="text/javascript"></script>
+<script src="js/particles/BloodParticle.js" type="text/javascript"></script>
+<script src="js/particles/TimedParticle.js" type="text/javascript"></script>
+<script src="js/particles/HealthParticle.js" type="text/javascript"></script>
+<script src="js/particles/BloodFactory.js" type="text/javascript"></script>
+<script src="js/particles/TimedParticleFactory.js" type="text/javascript"></script>
+<script src="js/particles/HealthParticleFactory.js" type="text/javascript"></script>
+
+<script src="js/Helper.js" type="text/javascript"></script>
+<script src="js/Smoke.js" type="text/javascript"></script>
+
+<script src="js/particles/ParticleCleaner.js" type="text/javascript"></script>
+
+<script src="js/enemies/Enemy.js" type="text/javascript"></script>
+<script src="js/enemies/Mutant.js" type="text/javascript"></script>
+<script src="js/enemies/Bouncer.js" type="text/javascript"></script>
+<script src="js/enemies/Skull.js" type="text/javascript"></script>
+<script src="js/enemies/Jumper.js" type="text/javascript"></script>
+<script src="js/enemies/Boss.js" type="text/javascript"></script>
+<script src="js/EnemyManager.js" type="text/javascript"></script>
+
+<script src="js/Fly.js" type="text/javascript"></script>
+<script src="js/Bedlam.js" type="text/javascript"></script>
+
+<script src="js/enemyMovementStrategies/GlidingStrategy.js" language="javascript" type="text/javascript"></script>
+<script src="js/enemyMovementStrategies/JumpingStrategy.js" language="javascript" type="text/javascript"></script>
+<script src="js/enemyMovementStrategies/FlyingStrategy.js" language="javascript" type="text/javascript"></script>
+<script src="js/enemyMovementStrategies/MutantStrategy.js" language="javascript" type="text/javascript"></script>
+<script src="js/enemyMovementStrategies/BossStrategy.js" language="javascript" type="text/javascript"></script>
+<br />
+<a href="http://steenstn.github.io/">Home</a> | <a href="mailto:alest849@gmail.com">Contact</a><br />
+<canvas id='c'></canvas>
+<script>
+
+var debug = 0;
+var pixelBackground = 0;
+var keyHeldDown = 0;
+var numFramesSinceStart = 0;
+
+var gLoop,
+c = document.getElementById('c'),
+ctx = c.getContext('2d');
+
+c.width = Viewport.width;
+c.height = Viewport.height;
+
+var totalNumVinylCollected = 0;
+
+var vinylCollectedInLevel = 0;
+var numVinylInLevel = 0;
+var totalVinylsInAllLevels = 0;
+
+var bloodImage = new Image();
+bloodImage.src = "particles/bloodpixel.png";
+
+var coinParticleImage=new Image();
+coinParticleImage.src = "particles/coinpixel.png";
+
+var dirtParticleImage=new Image();
+dirtParticleImage.src = "particles/dirtpixel.png";
+
+var healthParticleImage = new Image();
+healthParticleImage.src = "particles/greenpixel.png";
+
+var rock1Image = new Image();
+rock1Image.src = GameState.christmasMode ? "images/rock1xmas.png" : "images/rock1.png";
+
+var baguetterockImage = new Image();
+baguetterockImage.src = "images/baguetterock.png";
+
+var tree1Image = new Image();
+tree1Image.src = GameState.christmasMode ? "images/tree1xmas.png" : "images/tree1.png";
+
+var grassImage = new Image();
+grassImage.src = GameState.christmasMode ? "images/grassxmas.png" : "images/grass.png";
+var flower1Image = new Image();
+flower1Image.src = "images/flower1.png";
+var vines1Image = new Image();
+vines1Image.src = GameState.christmasMode ? "images/vines1xmas.png" : "images/vines1.png";
+
+var healthParticleFactory = new HealthParticleFactory(healthParticleImage);
+var coinParticleFactory = new TimedParticleFactory(coinParticleImage);
+var dirtParticleFactory = new TimedParticleFactory(dirtParticleImage);
+
+var finalImage = new Image();
+finalImage.src = "images/studiofinal.png";
+
+var bossDeadTimer = 160;
+var logoImage = new Image();
+logoImage.src = "images/logo2.png";
+
+var jukeBox = new Jukebox(["songs/roulette_dares.mp3","songs/teflon.mp3", "songs/eriatarka.mp3", "songs/vermicide.mp3", "songs/televators.mp3", "songs/cotopaxi.mp3"], "songs/inertiaticesp.mp3");
+var bloodFactory = new BloodFactory(bloodImage);
+
+var particleCleaner = new ParticleCleaner();
+
+var flowers = [];
+var effects = [];
+
+var bedlam;
+
+var image = new Image();
+image.src = GameState.christmasMode ? "images/playerspritexmas.png" : "images/playersprite.png";
+
+var image2 = new Image();
+image2.src = GameState.christmasMode ? "images/playersprite2xmas.png" : "images/playersprite2.png";
+var players = [];
+
+var playerKeys = [];
+
+var startPos = {};
+
+var backgroundImage = new Image();
+backgroundImage.src = "images/background.png";
+
+var background = new Background(ctx);
+
+for(var i=0;i<Level.currentLevel.length;i++) {
+	Level.currentLevel[i]=new Object();
+}
+
+var enemies={};
+var content = [];
+var backgroundContent = [];
+var foregroundContent = [];
+var particles = [];
+var GUIRenderables = [];
+
+var flies = [];
+
+Level.loadTileset();
+
+var init = function() {
+  numFramesSinceStart = 0;
+
+	particles = [];
+
+  for(var i = 0; i < players.length; i++) {
+    players[i].x = players[i].oldx;
+  	players[i].y = players[i].oldy;
+    players[i].speedx = 0;
+    players[i].speedy = 0;
+  	GameState.score=GameState.lastScore;
+  	players[i].hp=100;
+    players[i].inBucket = false;
+  }
+
+}
+
+var addPlayer = function(playerImage, keyLeft, keyUp, keyRight) {
+  var p = new Player(0,0,playerImage);
+  p.keyLeft = keyLeft;
+  p.keyUp = keyUp;
+  p.keyRight = keyRight;
+  players.push(p);
+}
+
+var setUpKeyMap = function() {
+  playerKeys.push(["⇦", "⇧", "⇨"]);
+  if(players[1]) {
+    playerKeys.push(["A", "W", "D"]);
+  }
+}
+
+var keysDown = {};
+
+addEventListener("keydown", function (e) {
+	keysDown[e.keyCode] = true;
+}, false);
+
+addEventListener("keyup", function (e) {
+	delete keysDown[e.keyCode];
+}, false);
+
+var canvas = document.getElementById('c');
+
+var clear = function(){
+  if(pixelBackground) {
+  ctx.drawImage(backgroundImage,0,0);
+  } else {
+    background.drawBackground();
+  }
+}
+
+var clearBlack = function() {
+  ctx.fillStyle = '#000';
+  ctx.clearRect(0, 0, Viewport.width, Viewport.height);
+  ctx.beginPath();
+  ctx.rect(0, 0, Viewport.width, Viewport.height);
+  ctx.closePath();
+  ctx.fill();
+}
+
+var render = function(){
+	for(var i = 0; i < players.length; i++) {
+    players[i].draw(ctx);
+    if(players[i].drawingSmoke===1) {
+      effects.push(new Smoke(players[i].x, players[i].y+players[i].height-10, Smoke.LandingSmoke));
+      players[i].drawingSmoke++;
+    }
+    if(players[i].speedy === 0 && players[i].drawingLeftBrakingSmoke > 1 && players[i].drawingLeftBrakingSmoke%2===0) {
+      effects.push(new Smoke(players[i].x-10, players[i].y+players[i].height-10, Smoke.LeftSmoke));
+      players[i].drawingLeftBrakingSmoke++;
+    }
+    if(players[i].speedy === 0 && players[i].drawingRightBrakingSmoke > 1 && players[i].drawingRightBrakingSmoke%2===0) {
+      effects.push(new Smoke(players[i].x+players[i].width, players[i].y+players[i].height-10, Smoke.RightSmoke));
+      players[i].drawingRightBrakingSmoke++;
+    }
+    if(debug===1) {
+      players[i].drawHurtZone(ctx);
+      players[i].drawKillZone(ctx);
+    }
+
+  }
+  effects.forEach((e) => e.draw(ctx));
+};
+
+var renderEnemies = function()
+{
+	for(var i=0;i<enemies.length;i++)
+	{
+    var enemyWidth = typeof enemies[i].width == 'number' ? enemies[i].width : 20;
+    var enemyHeight = typeof enemies[i].height == 'number' ? enemies[i].height : 20;
+    var offsetx = typeof enemies[i].offsetx == 'number' ? enemies[i].offsetx : 0;
+    var offsety = typeof enemies[i].offsety == 'number' ? enemies[i].offsety : 0;
+    if(debug == 1) {
+      ctx.fillStyle = '#FF0a00';
+      ctx.beginPath();
+      ctx.rect(enemies[i].x + offsetx + Viewport.x, enemies[i].y + offsety + Viewport.y,enemyWidth, enemyHeight);
+      ctx.closePath();
+      ctx.fill();
+    }
+    enemies[i].draw(ctx);
+	}
+}
+
+var renderContent = function(content) {
+    var offset = typeof content.offset == 'number' ? content.offset : 0;
+    switch(content.type) {
+      case "rock1":
+        ctx.drawImage(rock1Image, offset*21, 0, 21, 9, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y), 21, 9);
+        break;
+      case "baguetterock":
+        ctx.drawImage(baguetterockImage, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y));
+        break;
+      case "tree1":
+        ctx.drawImage(tree1Image, offset*72, 0, 72, 96, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y), 72, 96);
+        break;
+      case "flower1":
+        ctx.drawImage(flower1Image, offset*7, 0, 7, 15, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y), 7, 15);
+        break;
+      case "vines1":
+        ctx.drawImage(vines1Image, offset*20, 0, 20, 40, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y), 20, 40);
+        break;
+      case "grass":
+        var yFrame = 0;
+        if((Math.abs(players[0].speedx) > 0.5 && Helper.overlap(content.x+8, content.y+8, 34, 34, players[0].x, players[0].y, players[0].width, players[0].height)) ||
+           (players[1] && Math.abs(players[1].speedx) > 0.5 && Helper.overlap(content.x+8, content.y+8, 34, 42, players[1].x, players[1].y, players[1].width, players[1].height)))
+        {
+          yFrame = numFramesSinceStart%10 > 3 ? numFramesSinceStart%10 > 6 ? 2: 1 : 0;
+        }
+        ctx.drawImage(grassImage, offset*50, yFrame*50, 50, 50, Math.round(content.x + Viewport.x), Math.round(content.y + Viewport.y), 50, 50);
+        break;
+    }
+}
+
+var updatePlayer = function(index) {
+
+  if(index === 0 && players[1]) { // Collision between players
+    var distX = players[0].x+players[0].width/2 - (players[1].x+players[1].width/2);
+    var distY = players[0].y+players[0].height/2 - (players[1].y+players[1].height/2);
+
+    var squareDist = distX*distX + distY*distY;
+    if(squareDist <= (players[0].width/2 + players[1].width/2) * (players[0].width/2 + players[1].width/2)){
+      players[0].x = players[0].oldx;
+      players[0].y = players[0].oldy;
+
+      players[1].x = players[1].oldx;
+      players[1].y = players[1].oldy;
+
+      var xSpeed = players[0].speedx;
+      var ySpeed = players[0].speedy;
+      players[0].speedx = players[1].speedx;
+      players[0].speedy = players[1].speedy != 0 ? players[1].speedy : -players[0].speedy;
+
+      players[1].speedx = xSpeed;
+      players[1].speedy = ySpeed != 0 ? ySpeed : -players[1].speedy;
+
+    }
+  }
+
+  players[index].update(); 
+
+	var arrayPos=Math.floor((players[index].x+players[index].width/2)/Level.tileSize)+Math.floor((players[index].y+players[index].height)/Level.tileSize)*Level.width;
+
+	if(Level.currentLevel[arrayPos].type=="p" || Level.currentLevel[arrayPos].type=="q") // health
+	{
+		Level.currentLevel[arrayPos].type=".";
+    for(let i = 0; i < 30; i++) {
+      if(players[1]) {
+        particles.push(healthParticleFactory.createParticle(players[index].x, players[index].y, players[1-index], players[0]));
+      }
+      particles.push(healthParticleFactory.createParticle(players[index].x, players[index].y, players[index], players[0]));
+      
+    }
+    GameState.score += 10;
+	}
+	if(Level.currentLevel[arrayPos].type=="s") // Coins
+	{
+		GameState.score+=20;
+    GameState.scoreTimer=10;
+    vinylCollectedInLevel++;
+		Level.currentLevel[arrayPos].type=".";
+    for(let i = 0; i < 30; i++) {
+      particles.push(coinParticleFactory.createParticle(players[index].x, players[index].y,100));
+    }
+	}
+	if(Level.currentLevel[arrayPos].type=="l" || Level.currentLevel[arrayPos].type=="m" || Level.currentLevel[arrayPos].type=="n" || Level.currentLevel[arrayPos].type=="o") // Phadderist
+	{
+		GameState.score+=50;
+    GameState.scoreTimer=10;
+		Level.currentLevel[arrayPos].type=".";
+  }
+  
+}
+
+var updateEnemies = function(i) {
+		EnemyManager.updateEnemy(enemies[i], players, bloodFactory, particles);
+    if(!enemies[i].alive) {
+      enemies.splice(i,1);
+    }
+
+    if(enemies[i] && enemies[i].type=="boss") {
+      if(enemies[i].breakingBlock) {
+        for(let j = 0; j < 80; j++) {
+          
+          particles.push(dirtParticleFactory.createParticle(enemies[i].x+enemies[i].width/2, enemies[i].y+enemies[i].height,100));
+        }
+      }
+      if(enemies[i].firing) {
+
+        for(var playerIndex = 0; playerIndex < players.length; playerIndex++) {
+          var currentPlayer = players[playerIndex];
+          var beamWidth;
+          var beamStartx;
+          var beamStarty;
+          var beamHeight;
+          if(enemies[i].speedx < 0) {
+            beamWidth = enemies[i].x;
+            beamStartx = 0;
+            beamStarty = enemies[i].y
+            beamHeight = enemies[i].height;
+          } else {
+            beamWidth  = Viewport.width;
+            beamStartx = enemies[i].x+enemies[i].width;
+            beamStarty = enemies[i].y
+            beamHeight = enemies[i].height;
+          }
+          if(Helper.overlap(currentPlayer.x, currentPlayer.y, currentPlayer.width, currentPlayer.height,beamStartx, beamStarty, beamWidth,beamHeight)) {
+            var direction = enemies[i].speedx > 0 ? 1 : -1;
+            currentPlayer.speedx=direction*WorldConstants.kickbackForce;
+            for(var bloodIndex = 0; bloodIndex < WorldConstants.bloodAmount/4; bloodIndex++) {
+              particles.push(bloodFactory.createBlood(currentPlayer.x, currentPlayer.y, direction));
+            }
+            players[0].hp-=0.9;
+          }
+
+        }
+      }
+    }
+}
+
+var checkKeys = function (modifier) {
+  if(79 in keysDown) { // o
+    keyHeldDown++;
+    if(keyHeldDown === 1) {
+      debug = 1 - debug;
+    }
+  } else if(71 in keysDown) { // g
+    keyHeldDown++;
+    if(keyHeldDown === 1) {
+      pixelBackground = 1 - pixelBackground;
+    }
+  } else {
+    keyHeldDown = 0;
+  }
+	for(var i = 0; i < players.length; i++) {
+    if(players[i].drawingLeftBrakingSmoke > 1) {
+      players[i].drawingLeftBrakingSmoke = 0;
+    }
+    if(players[i].drawingRightBrakingSmoke > 1) {
+      players[i].drawingRightBrakingSmoke = 0;
+    }
+		if (GameState.animating=== 0 && players[i].keyUp in keysDown) {
+      playerKeys[i][1] = "";
+			if(players[i].jumping < WorldConstants.maxJump) {
+				players[i].jumping++;
+        players[i].drawingSmoke++;
+				if(players[i].speedy>-WorldConstants.jumpStrength)
+				    players[i].speedy=-WorldConstants.jumpAcc;
+        }
+		} else if(GameState.animating === 0 && players[i].speedy<0) {
+      players[i].jumping=WorldConstants.maxJump;
+      players[i].speedy/=1.05;
+    }
+
+		if (GameState.animating === 0 && players[i].keyLeft in keysDown) {
+      playerKeys[i][0] = "";
+		  players[i].goingLeft = 1;
+		  players[i].animationCounter++;
+    if(players[i].speedx> WorldConstants.maxSpeedx-1) {
+      players[i].drawingRightBrakingSmoke++;
+    }
+			if(players[i].speedx>-WorldConstants.maxSpeedx)
+				players[i].speedx -= WorldConstants.playerAcc * modifier;
+		}
+		else if (GameState.animating === 0 && players[i].keyRight in keysDown) {
+      playerKeys[i][2] = "";
+      players[i].goingLeft = 0;
+      players[i].animationCounter++;
+      if(players[i].speedx< -WorldConstants.maxSpeedx+1) {
+        players[i].drawingLeftBrakingSmoke++;
+      }
+			if(players[i].speedx<WorldConstants.maxSpeedx)
+				players[i].speedx += WorldConstants.playerAcc * modifier;
+		}
+		else
+			players[i].speedx/=players[i].friction; // Decelerate
+      if(Math.abs(players[i].speedx) < 0.05) {
+        players[i].x = Math.round(players[i].x);
+        players[i].idleAnimationCounter++;
+      }
+		}
+
+}
+
+var loadContent = function(levelName) {
+	enemies = Helper.loadJsonFile("levels/" + levelName+'enemies.json');
+  for(var i = 0; i < enemies.length; i++) {
+    switch(enemies[i].type) {
+      case "skull":
+      case "skurkerist": 
+        enemies[i]= new Skull(enemies[i])
+        break;
+      case "mutant":
+        enemies[i] = new Mutant(enemies[i]);
+        break;
+      case "jumper": 
+        enemies[i] = new Jumper(enemies[i]);
+        break;
+      case "bouncer": 
+        enemies[i] = new Bouncer(enemies[i]);
+        break;
+      case "boss":
+        enemies[i] = new Boss(enemies[i]);
+        GUIRenderables.push(new BossHealthBar(enemies[i].getHp));
+        break;
+    }
+  }
+	var tempContent = Helper.loadJsonFile("levels/" + levelName+'content.json');
+
+  for(var i = 0; i < tempContent.length; i++) {
+    if(tempContent[i].type=="vines1") {
+      var numTypes = 3;
+      tempContent[i].offset = i%numTypes;
+    } else if(tempContent[i].type=="flower1") {
+        var numTypes = 4;
+        tempContent[i].offset = i%numTypes;
+    } else if(tempContent[i].type=="tree1") {
+        var numTypes = 5;
+        tempContent[i].offset = (i-1)%numTypes;
+    } else if(tempContent[i].type == "rock1") {
+        var numTypes = 5;
+        tempContent[i].offset = i%numTypes;
+    } else if(tempContent[i].type == "grass") {
+      var numTypes = 3;
+      tempContent[i].offset = i%numTypes;
+    }
+    if(typeof tempContent[i].flower !== 'undefined' && tempContent[i].flower === true) {
+      content.push(tempContent[i]);
+    } if(typeof tempContent[i].zIndex !== 'undefined' && tempContent[i].zIndex === 0) {
+      backgroundContent.push(tempContent[i]);
+    } else if(typeof tempContent[i].zIndex !== 'undefined' && tempContent[i].zIndex === 1){
+      foregroundContent.push(tempContent[i]);
+    } else {
+      content.push(tempContent[i]);
+    }
+  }
+}
+
+var loadLevel = function(levelNumber) {
+  numVinylInLevel = 0;
+  vinylCollectedInLevel = 0;
+  clearBlack();
+
+  var levelName = "level"+levelNumber;
+   Level.currentLevel = new Array(Level.width*Level.height);
+
+  for(var i=0;i<Level.currentLevel.length;i++) { // set up an object for all tiles
+  	Level.currentLevel[i]=new Object();
+  }
+  var txtFile = new XMLHttpRequest();
+  ctx.textAlign = "left";
+  drawText("Loading song...", 10,10);
+  jukeBox.selectSong(GameState.currentLevel);
+
+  drawText("Loading level...", 10, 20);
+  txtFile.open("GET", "levels/" + levelName + ".txt", true);
+  txtFile.onreadystatechange = function() {
+    if (txtFile.readyState === 4) {  // Makes sure the document is ready to parse.
+      if (txtFile.status === 200 || txtFile.status == 0) {  // Makes sure it's found the file.
+        allText = txtFile.responseText;
+  	    allText = allText.replace(/(\r\n|\n|\r)/gm,"");
+        drawText("Parsing level...", 10,30);
+
+        var loadingBarMaxWidth = 600;
+
+        for(var y=0;y<Level.height;y++) {
+          var progress = (y/Level.height) * loadingBarMaxWidth;
+          ctx.beginPath();
+
+          ctx.rect(30, 60, progress, 2);
+          ctx.closePath();
+          ctx.fill();
+
+          for(var x=0;x<Level.width;x++) {
+            var arrayPos = x+y*Level.width;
+            Level.currentLevel[arrayPos].type=allText[arrayPos]; // What kind of block is it?
+            var tile = LevelTile.newFromCharacter(Level.currentLevel[arrayPos].type);
+            Level.currentLevel[arrayPos].blocking=tile.blocking; // Blocking tile
+            Level.currentLevel[arrayPos].tileOffsetx=tile.drawingOffsetx; // Where in the tileset the tile is
+            Level.currentLevel[arrayPos].tileOffsety=tile.drawingOffsety;
+            if(allText[arrayPos]==='s') {
+              numVinylInLevel++;
+            }
+          }
+        }
+
+        if(GameState.lastLevel<levelNumber) {
+          totalVinylsInAllLevels+=numVinylInLevel;
+          GameState.lastLevel = levelNumber;
+        }
+      }
+
+    }
+  }
+  txtFile.send(null);
+
+  drawText("Loading enemies...", 10, 40);
+  content.length = 0;
+  flies.length = 0;
+  backgroundContent.length = 0;
+  foregroundContent.length = 0;
+  flowers.length = 0;
+  loadContent(levelName);
+  setUpContent();
+  jukeBox.playCurrentSong();
+}
+
+var setUpContent = function() {
+
+	for(var i = 0; i < content.length; i++) {
+		switch(content[i].type) {
+			case "startPos":
+        var offset = 15;
+        players[0].x = players[0].oldx = content[i].x - offset;
+        players[0].y = players[0].oldy = content[i].y;
+        if(players[1]) {
+          players[1].x = players[1].oldx = content[i].x + offset;
+          players[1].y = players[1].oldy = content[i].y;
+        }
+        startPos.x = content[i].x;
+        startPos.y = content[i].y;
+	      break;
+      case "flynest":
+        for(var j = 0; j < content[i].numFlies; j++) {
+          flies.push(new Fly(content[i].x, content[i].y));
+        }
+        break;
+      case "flower1":
+        flowers.push(content[i]);
+        break;
+		}
+	}
+}
+
+var drawText = function(textToDraw, x, y) {
+  ctx.fillStyle    = '#F00';
+  ctx.font         = '10px Verdana';
+  ctx.textBaseline = 'Top';
+  ctx.fillText  (textToDraw, x, y);
+}
+
+var drawAllText = function() {
+    var scoreFontSize = 14 + GameState.scoreTimer/2;
+	  ctx.fillStyle    = GameState.christmasMode ? '#000' : '#fff';
+    ctx.font         = '14px Verdana';
+    ctx.textBaseline = 'Top';
+    ctx.textAlign = 'left';
+    ctx.fillText  ("Score:", 4,20);
+    ctx.font         = scoreFontSize + 'px Verdana';
+    ctx.fillText  (GameState.score, 55,20);
+    ctx.font         = '14px Verdana';
+    ctx.fillStyle = vinylCollectedInLevel >= numVinylInLevel ? "#0f0" : "#fff";
+    ctx.fillText(vinylCollectedInLevel + "/" + numVinylInLevel, 38, Viewport.height-13);
+    
+    ctx.font         = '11px Verdana';
+    playerKeys.forEach(p => p.forEach(key => ctx.fillText(key, Viewport.x+players[playerKeys.indexOf(p)].x-5+p.indexOf(key)*10,
+     Viewport.y+players[playerKeys.indexOf(p)].y-5)));
+    
+    if(GameState.scoreTimer>0) {
+      GameState.scoreTimer--;
+    }
+    if(GameState.outOfBoundsTimer >= 3 && numFramesSinceStart > 10) {
+      var fadeOutFactor = GameState.outOfBoundsTimer/100;
+      ctx.fillStyle    = 'rgba(255,255,255,' + fadeOutFactor + ')';
+      ctx.font         = '40px Verdana';
+      ctx.textBaseline = 'Top';
+      ctx.textAlign = 'center';
+      ctx.fillText  ("Please get back together.", 320,100);
+      GameState.outOfBoundsTimer-=2;
+    }
+
+    if(debug===1) {
+      var particlesThatShouldBeDeleted = 0;
+      for(var i = 0; i < particles.length; i++){
+        if(particles[i].shouldBeDeleted) particlesThatShouldBeDeleted++;
+      }
+      ctx.font = "10px Verdana";
+      ctx.fillText("particles: " + particles.length, 4,60);
+      ctx.fillText("particlesThatShouldBeDeleted: " + particlesThatShouldBeDeleted, 4,70);
+      ctx.fillText("numFramesSinceStart: " + numFramesSinceStart, 4,80);
+      ctx.fillText("Player 1 coordinates: " + Math.round(players[0].x) + " - " + Math.round(players[0].y), 4,90);
+      ctx.fillText("effects: " + effects.length, 4, 100);
+    }
+}
+
+var GameLoop = function(){
+  numFramesSinceStart++;
+	clear();
+
+	if(players[0].hp<1) {
+		players[0].hp=0;
+    if(players[1]) {
+      players[1].hp=0;
+    }
+		GameState.score=GameState.lastScore;
+    GameState.numDeaths++;
+    vinylCollectedInLevel = 0;
+    flies= [];
+		loadLevel(GameState.currentLevel);
+
+		init();
+    GameState.animating = 1;
+  }
+  
+  if(GameState.animating===1) {
+    Viewport.moveTowardsCenter(startPos.x,startPos.y,startPos.x,startPos.y, 30);
+    if(players[0].x + Viewport.x > -1*players[0].width+5 &&
+       players[0].x + Viewport.x < Viewport.width -5 &&
+       players[0].y + Viewport.y < Viewport.height - players[0].height+10 &&
+       players[0].y + Viewport.y > 0) {
+
+       GameState.animating = 0;
+    }
+  }
+
+	if(GameState.animating===0) {
+		checkKeys(1);
+
+    for(var i = 0; i < players.length; i++) {
+      updatePlayer(i);
+    }
+    var x2 = players[1] ? players[1].x : players[0].x+(players[0].goingLeft ? -50 : 50)+10*players[0].speedx;
+    var y2 = players[1] ? players[1].y : players[0].y;
+    
+    Viewport.moveTowardsCenter(players[0].x, players[0].y, x2, y2);
+  }
+
+  // Draw background content after moving viewport to prevent sliding content
+  backgroundContent.forEach((c) => renderContent(c)); 
+  
+  if(GameState.animating===0) {
+    render();
+    for(var i = 0; i < enemies.length; i++) {
+      updateEnemies(i);
+    }
+    particles.forEach((p) => p.move());
+    for(var i = 0; i < flies.length; i++) {
+      flies[i].move(players, flowers);
+    }
+  }
+
+  renderEnemies();
+  for(var i = 0; i < stars.length; i++) {
+        stars[i].move();
+        stars[i].render(ctx);
+  }
+  Level.render(ctx);
+
+  for(var i = 0; i < particles.length; i++) {
+    if(!particles[i].shouldBeDeleted) {
+      particles[i].render(ctx);
+    }
+  }
+
+  foregroundContent.forEach((c) => renderContent(c));
+
+  if(GameState.animating===2) {
+    checkKeys(1);
+    
+    render();
+    bedlam.move(players);
+    bedlam.render(ctx);
+    if(bedlam.isComplete()) {
+      bedlam = null;
+      GameState.animating = 0;
+      totalNumVinylCollected+=vinylCollectedInLevel;
+      if(GameState.bossKilled) {
+        jukeBox.playFinalSong();
+        endScreen();
+        return;
+      } else {
+        loadLevel(GameState.currentLevel);
+        init();
+            
+        var x2 = players[1] ? players[1].x : players[0].x;
+        var y2 = players[1] ? players[1].y : players[0].y;
+        Viewport.moveToCenter(players[0].x, players[0].y, x2, y2);
+
+      }
+
+    }
+  }
+
+  if(GameState.animating===3) {
+    bossDeadTimer--;
+    checkKeys(0);
+    for(var i = 0; i < players.length; i++) {
+      updatePlayer(i);
+		}
+
+    var x2 = players[1] ? players[1].x : players[0].x;
+    var y2 = players[1] ? players[1].y : players[0].y;
+    Viewport.moveTowardsCenter(players[0].x, players[0].y, x2, y2);
+    render();
+    particles.forEach((p) => p.move());
+    if(bossDeadTimer<=0) {
+      bedlam = new Bedlam();
+      GameState.animating = 2;
+    }
+  }
+  flies.forEach((f) => f.render(ctx));
+
+  if(numFramesSinceStart%50 === 0) {
+    particleCleaner.cleanupBlood(particles);
+    cleanSmoke();
+  } else if(numFramesSinceStart%20 === 0) {
+    for(var i = 0; i < particles.length; i++) {
+      if(particles[i].shouldBeDeleted) {
+        particles.splice(i,1);
+      }
+    }
+  }
+
+  var arrayPos1 = Level.getBlockAtPos(players[0].getCenter());
+  var arrayPos2 = players[1] ? Level.getBlockAtPos(players[1].getCenter()) : arrayPos1;
+
+	if(GameState.animating===0 && (arrayPos1.type=="k" || arrayPos2.type=="k")) {
+    GameState.currentLevel++;
+			GameState.lastScore=GameState.score;
+      GameState.animating=2;
+      bedlam = new Bedlam();
+  }
+  
+  GUIRenderables.forEach((g) => g.render(ctx));
+
+  ctx.drawImage(Level.tileset, 64, 128, 32, 32, 4, Viewport.height-35, 32, 32);
+	drawAllText();
+
+	gLoop = setTimeout(GameLoop, 20);
+}
+
+var stars = [];
+for(var i = 0; i < 300; i++) {
+  if(GameState.christmasMode) {
+    stars.push(new Snowflake());
+  } else {
+    stars.push(new IntroStar());
+  }
+  
+}
+
+var cleanSmoke = function() {
+  var allEffectsDone = true;
+  for(var i = 0; i < effects.length; i++) {
+    if(!effects[i].isDone()) {
+      allEffectsDone = false;
+      break;
+    }
+  }
+  if(allEffectsDone) {
+    effects = [];
+  }
+}
+
+var selectedOption = 0;
+
+var IntroScreen = function() {
+    numFramesSinceStart++;
+    clearBlack();
+    if(!jukeBox.isSongPlaying()) {
+        ctx.fillStyle    = '#F00';
+        ctx.font         = '10px Verdana';
+        ctx.textAlign = 'center';
+        ctx.fillText  ("Loading...", 320,100);
+        ctx.fillRect(320-numFramesSinceStart, 120, 2*numFramesSinceStart, 1);
+    } else {
+      ctx.drawImage(logoImage,220,20);
+      ctx.fillStyle    = '#FFF';
+      for(var i = 0; i < stars.length; i++) {
+        stars[i].move();
+        stars[i].render(ctx);
+      }
+      ctx.fillStyle    = '#FFF';
+      ctx.textAlign = 'center';
+      ctx.font         = '26px Verdana';
+      ctx.fillText("-Back to the Studio-", 320, 170);
+      ctx.font         = '10px Verdana';
+      ctx.fillText  ("Help The Mars Volta get back to the studio in order to record a new album.", 320,195);
+      ctx.fillStyle    = '#F00';
+      ctx.font         = '12px Verdana';
+
+      
+      ctx.textAlign = 'left';
+      ctx.fillStyle = selectedOption === 0 ? "#0F0" : "#F00";
+      ctx.fillText  ("1 PLAYER GAME (CEDRIC)", 235,230);
+      ctx.fillStyle = selectedOption === 1 ? "#0F0" : "#F00";
+      ctx.fillText  ("1 PLAYER GAME (OMAR)", 235,250);
+      ctx.fillStyle = selectedOption === 2 ? "#0F0" : "#F00";
+      ctx.fillText  ("2 PLAYER GAME (CEDRIC + OMAR)", 235,270);
+      
+      if(40 in keysDown) {
+        keyHeldDown++;
+        if(keyHeldDown === 1) {
+          selectedOption = selectedOption >= 2 ? 0 : ++selectedOption;
+        } 
+      } else if(38 in keysDown) {
+        keyHeldDown++;
+        if(keyHeldDown === 1) {
+          selectedOption = selectedOption <= 0 ? 2 : --selectedOption;
+        } 
+      } else {
+          keyHeldDown = 0;
+      }
+      if(32 in keysDown || 13 in keysDown) {
+        if(selectedOption===0) {
+          addPlayer(image2, 37, 38, 39)
+        } else if(selectedOption===1) {
+          addPlayer(image,37,38,39);
+        } else if(selectedOption===2) {
+          addPlayer(image,37,38,39);
+          addPlayer(image2,65,87,68);
+        }
+        GUIRenderables.push(new PlayerHealthBar(players[0].getHp));
+        setUpKeyMap();
+        if(!GameState.christmasMode) {
+          stars = [];
+        }
+        
+        loadLevel(GameState.currentLevel);
+        GameLoop();
+        var x2 = players[1] ? players[1].x : players[0].x;
+        var y2 = players[1] ? players[1].y : players[0].y;
+        
+        Viewport.moveToCenter(players[0].x, players[0].y, x2, y2);
+        return
+      } else if(77 in keysDown && 86 in keysDown) {
+        addPlayer(image,37,38,39);
+        addPlayer(image2,65,87,68);
+        GUIRenderables.push(new PlayerHealthBar(players[0].getHp));
+        if(!GameState.christmasMode) {
+          stars = [];
+        }
+        setUpKeyMap();
+        GameState.currentLevel = 0;
+        loadLevel(GameState.currentLevel);
+        var x2 = players[1] ? players[1].x : players[0].x;
+        var y2 = players[1] ? players[1].y : players[0].y;
+        
+        Viewport.moveToCenter(players[0].x, players[0].y, x2, y2);
+        GameLoop();
+        return;
+      } 
+    }
+    gLoop = setTimeout(IntroScreen, 20);
+}
+
+var endScreen = function() {
+
+  numFramesSinceStart++;
+  var frame = numFramesSinceStart%20>10 ? 1 : 0;
+  clearBlack();
+  ctx.drawImage(finalImage, 222*frame,0, 222, 99, Viewport.width-300, Viewport.height-150, 222, 99);
+  drawText("Congratulations! You have made it back to the studio!", 50, 50);
+  drawText("Recording of the new album can now begin thanks to you.", 50, 65);
+  drawText("Fans everywhere are rejoicing and getting ready for the album release.", 50, 80);
+  drawText("Hopefully they won't need to wait for too long...", 50, 95);
+
+  ctx.font = '20px Verdana';
+  ctx.fillText("Final score: " + GameState.score, 50, 220);
+  ctx.fillText("Vinyls collected: " + totalNumVinylCollected + "/" + totalVinylsInAllLevels, 50, 245);
+  ctx.fillText("Number of deaths: " + GameState.numDeaths, 50, 270);
+  gLoop = setTimeout(endScreen, 20);
+}
+jukeBox.selectSong(0);
+ctx.fillStyle = "#f00";
+ctx.font         = '10px Verdana';
+ctx.textAlign = "center"
+ctx.fillText("Original music by The Mars Volta", 320, 100);
+ctx.fillText("Songs made into 8bit by Mhztransmission, taxIN7", 320, 120);
+ctx.fillText("Click me to play.", 320, 180);
+
+var startGame = function() {
+  jukeBox.playCurrentSong();
+  IntroScreen();
+  c.removeEventListener('click', startGame);
+}
+c.addEventListener('click', startGame, false);
+</script>
+<br />
+</body>
+</html>
