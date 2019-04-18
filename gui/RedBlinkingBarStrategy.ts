@@ -1,8 +1,11 @@
-class BossHealthBar implements GUIRenderable {
-    private getValueMethod : () => number;
-    private oldValue : number;
+class RedBlinkingBarStrategy implements BarRenderStrategy {
+    
     private barSize = 4;
     private barMaxValue : number;
+    private oldValue : number;
+    private getValueMethod : () => number;
+    private x : number;
+    private y : number;
 
     constructor(getValueMethod : () => number) {
         this.getValueMethod = getValueMethod;
@@ -10,7 +13,7 @@ class BossHealthBar implements GUIRenderable {
         this.barMaxValue = this.oldValue;
     }
 
-    render = (context) => {
+    render = (context: any) => {
         let value = this.getValueMethod();
 
         if(!value || value < 1) {
@@ -24,4 +27,5 @@ class BossHealthBar implements GUIRenderable {
         context.strokeRect(Viewport.width-50, Viewport.height-this.barSize*this.barMaxValue-10, 30, this.barSize*this.barMaxValue);
         this.oldValue = value;
     }
+
 }

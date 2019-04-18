@@ -55,8 +55,12 @@ GameState.christmasMode = isDecember ? true : false;
 </script>
 <script src="js/Vector.js" type="text/javascript"></script>
 <script src="js/gui/GUIRenderable.js" type="text/javascript"></script>
-<script src="js/gui/PlayerHealthBar.js" type="text/javascript"></script>
-<script src="js/gui/BossHealthBar.js" type="text/javascript"></script>
+<script src="js/gui/BarRenderStrategy.js" type="text/javascript"></script>
+<script src="js/gui/GreenToRedBarRenderStrategy.js" type="text/javascript"></script>
+<script src="js/gui/HealthBar.js" type="text/javascript"></script>
+<script src="js/gui/RedBlinkingBarStrategy.js" type="text/javascript"></script>
+
+
 <script src="js/Level.js" type="text/javascript"></script>
 <script src="js/LevelTile.js" type="text/javascript"></script>
 <script src="js/Viewport.js" type="text/javascript"></script>
@@ -521,7 +525,9 @@ var loadContent = function(levelName) {
         break;
       case "boss":
         enemies[i] = new Boss(enemies[i]);
-        GUIRenderables.push(new BossHealthBar(enemies[i].getHp));
+        let bossHealthBarStrategy = new RedBlinkingBarStrategy(enemies[0].getHp);
+        let bossHealthBar = new HealthBar(bossHealthBarStrategy);
+        GUIRenderables.push(bossHealthBar);
         break;
     }
   }
@@ -930,7 +936,13 @@ var IntroScreen = function() {
           addPlayer(image,37,38,39);
           addPlayer(image2,65,87,68);
         }
-        GUIRenderables.push(new PlayerHealthBar(players[0].getHp));
+        
+        let playerHealthBarRenderStrategy = new GreenToRedBarRenderStrategy(players[0].getHp,Viewport.width/2-50,16, 100, 8);
+        let playerHealthBar = new HealthBar(playerHealthBarRenderStrategy);
+        GUIRenderables.push(playerHealthBar);
+        
+        
+
         setUpKeyMap();
         if(!GameState.christmasMode) {
           stars = [];
@@ -946,7 +958,11 @@ var IntroScreen = function() {
       } else if(77 in keysDown && 86 in keysDown) {
         addPlayer(image,37,38,39);
         addPlayer(image2,65,87,68);
-        GUIRenderables.push(new PlayerHealthBar(players[0].getHp));
+        
+        let playerHealthBarRenderStrategy = new GreenToRedBarRenderStrategy(players[0].getHp,Viewport.width/2-50,16);
+        let playerHealthBar = new HealthBar(playerHealthBarRenderStrategy);
+        GUIRenderables.push(playerHealthBar);
+        
         if(!GameState.christmasMode) {
           stars = [];
         }
