@@ -379,10 +379,6 @@ let processTouchEnd = function(e) {
 }
 
 //if(mobile) {
-  c.addEventListener('touchstart', processTouchStart, false);
-  c.addEventListener('touchend', processTouchEnd, false);
-  c.addEventListener('touchmove', processTouchMove, false);
-  c.addEventListener('touchcancel', processTouchEnd, false);
 //}
 
 
@@ -1163,13 +1159,18 @@ if(mobile) {
 
  
 var startGame = function() {
+  c.removeEventListener('touchstart', startGame, false);
+  
+  c.addEventListener('touchstart', processTouchStart, false);
+  c.addEventListener('touchend', processTouchEnd, false);
+  c.addEventListener('touchmove', processTouchMove, false);
+  c.addEventListener('touchcancel', processTouchEnd, false);
   jukeBox.playCurrentSong();
   IntroScreen();
   c.removeEventListener('click', startGame);
-  //c.removeEventListener('touchstart', startGame, false);
 }
 c.addEventListener('click', startGame, false);
-//c.addEventListener('touchstart', startGame, false);
+c.addEventListener('touchstart', startGame, false);
 </script>
 <br />
 </body>
