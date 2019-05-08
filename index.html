@@ -238,7 +238,7 @@ var setUpKeyMap = function() {
     playerKeys.push(["A", "W", "D"]);
   }
 }
-
+let numTouches = 0;
 var keysDown = {};
 let tx=0;
 let ty=0;
@@ -251,6 +251,7 @@ addEventListener("keyup", function (e) {
 }, false);
 
 let processTouchStart = function(e) {
+  numTouches = e.touches.length;
   
   for(let i = 0; i < e.touches.length; i++) {
     var obj = c;
@@ -283,6 +284,8 @@ let processTouchStart = function(e) {
 
 let processTouchMove = function(e) {
   e.preventDefault();
+  numTouches = e.touches.length;
+  
   for(let i = 0; i < e.touches.length; i++) {
     var obj = c;
     var top = 0;
@@ -311,6 +314,10 @@ let processTouchMove = function(e) {
   
 }
 let processTouchEnd = function(e) {
+  numTouches = e.touches.length;
+  if(e.touches.length === 0) {
+    keysDown = [];
+  }
   for(let i = 0; i < e.touches.length; i++) {
     var obj = c;
     var top = 0;
@@ -326,15 +333,15 @@ let processTouchEnd = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-  if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
-    delete keysDown[37];
-  } 
-  if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
-    delete keysDown[39];
-  }
-  if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
-    delete keysDown[38];
-  } 
+    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+      delete keysDown[37];
+    } 
+    if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+      delete keysDown[39];
+    }
+    if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+      delete keysDown[38];
+    } 
 
   }
     
@@ -963,6 +970,7 @@ var GameLoop = function(){
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
     ctx.fillStyle = "#00f";
     ctx.fillRect(tx,ty,10,10);
+    ctx.fillText(numTouches, 200, 200);
   }
 	gLoop = setTimeout(GameLoop, 20);
 }
