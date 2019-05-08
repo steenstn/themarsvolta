@@ -249,6 +249,38 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
+let processTouchStart = function(e) {
+  let x = e.touches[0].clientX;
+  let y = e.touches[0].clientY;
+  let x2 = x;
+  let y2 = y;
+  if(e.touches.length > 1) {
+  let x2 = e.touches[1].clientX;
+  let y2 = e.touches[1].clientY;
+
+  }
+  if(Helper.overlap(x,y,1,1,1,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,1,Viewport.height-80,80,80)) {
+    keysDown[37] = true;
+  }
+  if(Helper.overlap(x,y,1,1,85,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,85,Viewport.height-80,80,80)) {
+    keysDown[39] = true;
+  }
+  if(Helper.overlap(x,y,1,1,Viewport.width-80,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,Viewport.width-80,Viewport.height-80,80,80)) {
+    keysDown[38] = true;
+  }
+  
+}
+let processTouchEnd = function(e) {
+  keysDown = [];
+
+}
+
+if(mobile) {
+  addEventListener('touchstart', processTouchStart, false);
+  addEventListener('touchend', processTouchEnd, false);
+}
+
+
 var canvas = document.getElementById('c');
 
 var clear = function(){
@@ -681,7 +713,7 @@ var drawAllText = function() {
     ctx.fillText  (GameState.score, 55,20);
     ctx.font         = '14px Verdana';
     ctx.fillStyle = vinylCollectedInLevel >= numVinylInLevel ? "#0f0" : "#fff";
-    ctx.fillText(vinylCollectedInLevel + "/" + numVinylInLevel, 38, Viewport.height-13);
+    ctx.fillText(vinylCollectedInLevel + "/" + numVinylInLevel, mobile ? Viewport.width/2+10 : 38, Viewport.height-13);
     
     ctx.font         = '11px Verdana';
     playerKeys.forEach(p => p.forEach(key => ctx.fillText(key, Viewport.x+players[playerKeys.indexOf(p)].x-5+p.indexOf(key)*10,
@@ -854,9 +886,14 @@ var GameLoop = function(){
   
   GUIRenderables.forEach((g) => g.render(ctx));
 
-  ctx.drawImage(Level.tileset, 64, 128, 32, 32, 4, Viewport.height-35, 32, 32);
+  ctx.drawImage(Level.tileset, 64, 128, 32, 32, mobile ? Viewport.width/2-32 : 4, Viewport.height-35, 32, 32);
 	drawAllText();
-
+  if(mobile) {
+    ctx.fillStyle= "rgba(255,255,255,0.4)";
+    ctx.fillRect(1,Viewport.height-80,80,80);
+    ctx.fillRect(85,Viewport.height-80,80,80);
+    ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
+  }
 	gLoop = setTimeout(GameLoop, 20);
 }
 
@@ -932,7 +969,10 @@ var IntroScreen = function() {
       } else {
           keyHeldDown = 0;
       }
-      if(32 in keysDown || 13 in keysDown) {
+      if(mobile) {
+        selectedOption = 1;
+      }
+      if(32 in keysDown || 13 in keysDown || mobile) {
         if(selectedOption===0) {
           addPlayer(image2, 37, 38, 39)
         } else if(selectedOption===1) {
@@ -1009,9 +1049,6 @@ ctx.textAlign = "center"
 ctx.fillText("Original music by The Mars Volta", 320, 100);
 ctx.fillText("Songs made into 8bit by Mhztransmission, taxIN7", 320, 120);
 ctx.fillText("Click me to play.", 320, 180);
-if(mobile) {
-  ctx.fillText("NO MOBILE SUPPORT. KEYBOARD REQUIRED", 320, 200);
-}
 
  
 var startGame = function() {
