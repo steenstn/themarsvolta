@@ -1147,10 +1147,10 @@ var startGame = function() {
   jukeBox.playCurrentSong();
   IntroScreen();
   c.removeEventListener('click', startGame);
-  c.removeEventListener('touchstart', startGame, false);
+  //c.removeEventListener('touchstart', startGame, false);
 }
 c.addEventListener('click', startGame, false);
-c.addEventListener('touchstart', startGame, false);
+//c.addEventListener('touchstart', startGame, false);
 </script>
 <br />
 </body>
