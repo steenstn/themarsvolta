@@ -253,7 +253,7 @@ addEventListener("keyup", function (e) {
 }, false);
 
 let processTouchStart = function(e) {
-  
+  e.preventDefault();
   numTouches = e.touches.length;
   
   for(let i = 0; i < e.touches.length; i++) {
@@ -344,6 +344,7 @@ let processTouchMove = function(e) {
   
 }
 let processTouchEnd = function(e) {
+  e.preventDefault();
   numTouches = e.touches.length;
   if(e.touches.length === 0) {
     keysDown = [];
@@ -1027,6 +1028,7 @@ var IntroScreen = function() {
     numFramesSinceStart++;
     clearBlack();
     if(!jukeBox.isSongPlaying()) {
+        jukeBox.playCurrentSong();
         ctx.fillStyle    = '#F00';
         ctx.font         = '10px Verdana';
         ctx.textAlign = 'center';
@@ -1165,7 +1167,6 @@ var startGame = function() {
   c.addEventListener('touchend', processTouchEnd, false);
   c.addEventListener('touchmove', processTouchMove, false);
   c.addEventListener('touchcancel', processTouchEnd, false);
-  jukeBox.playCurrentSong();
   IntroScreen();
   c.removeEventListener('click', startGame);
 }
