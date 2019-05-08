@@ -312,6 +312,23 @@ let processTouchMove = function(e) {
       delete keysDown[38];
     }
 
+  } 
+  for(let i = 0; i < e.touches.length; i++) {
+    var obj = c;
+    var top = 0;
+    var left = 0;
+    while (obj && obj.tagName != 'BODY') {
+        top += obj.offsetTop;
+        left += obj.offsetLeft;
+        obj = obj.offsetParent;
+    }
+
+    // return relative mouse position
+    let x = e.touches[i].clientX - left + window.pageXOffset;
+    let y = e.touches[i].clientY - top + window.pageYOffset;
+    tx = x;
+    ty = y;
+
     if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
       keysDown[37] = true;
     } 
@@ -321,7 +338,7 @@ let processTouchMove = function(e) {
     if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
       keysDown[38] = true;
     }
-  }  
+  }   
   
 }
 let processTouchEnd = function(e) {
@@ -979,7 +996,7 @@ var GameLoop = function(){
     ctx.fillRect(1,Viewport.height-80,80,80);
     ctx.fillRect(85,Viewport.height-80,80,80);
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
-    ctx.fillStyle = "#00f";
+    ctx.fillStyle = "#0f0";
     ctx.fillRect(tx,ty,10,10);
     ctx.fillText(numTouches, 200, 200);
   }
