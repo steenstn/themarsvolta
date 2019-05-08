@@ -251,6 +251,7 @@ addEventListener("keyup", function (e) {
 }, false);
 
 let processTouchStart = function(e) {
+  e.preventDefault();
   numTouches = e.touches.length;
   
   for(let i = 0; i < e.touches.length; i++) {
@@ -301,9 +302,19 @@ let processTouchMove = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
+    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+      delete keysDown[37];
+    } 
+    if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+      delete keysDown[39];
+    }
+    if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+      delete keysDown[38];
+    }
+
     if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
       keysDown[37] = true;
-    }
+    } 
     if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
       keysDown[39] = true;
     }
@@ -1136,8 +1147,10 @@ var startGame = function() {
   jukeBox.playCurrentSong();
   IntroScreen();
   c.removeEventListener('click', startGame);
+  c.removeEventListener('touchstart', startGame, false);
 }
 c.addEventListener('click', startGame, false);
+c.addEventListener('touchstart', startGame, false);
 </script>
 <br />
 </body>
