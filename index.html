@@ -278,13 +278,13 @@ let processTouchStart = function(e) {
     y2 = e.touches[1].clientY - top + window.pageYOffset;
 
   }
-  if(Helper.overlap(x,y,1,1,1,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,1,Viewport.height-80,80,80)) {
+  if(Helper.overlap(x*2,y*2,1,1,1,(Viewport.height-80)*2,80*2,80*2) || Helper.overlap(x2*2,y2*2,1,1,1,(Viewport.height-80)*2,80*2,80*2)) {
     keysDown[37] = true;
   }
-  if(Helper.overlap(x,y,1,1,85,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,85,Viewport.height-80,80,80)) {
+  if(Helper.overlap(x*2,y*2,1,1,85*2,(Viewport.height-80)*2,80*2,80*2) || Helper.overlap(x2*2,y2*2,1,1,85*2,(Viewport.height-80)*2,80*2,80*2)) {
     keysDown[39] = true;
   }
-  if(Helper.overlap(x,y,1,1,Viewport.width-80,Viewport.height-80,80,80) || Helper.overlap(x2,y2,1,1,Viewport.width-80,Viewport.height-80,80,80)) {
+  if(Helper.overlap(x*2,y*2,1,1,(Viewport.width-80)*2,(Viewport.height-80)*2,80*2,80*2) || Helper.overlap(x2*2,y2*2,1,1,(Viewport.width-80)*2,(Viewport.height-80)*2,80*2,80*2)) {
     keysDown[38] = true;
   }
   
