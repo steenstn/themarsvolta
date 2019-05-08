@@ -340,7 +340,7 @@ let processTouchEnd = function(e) {
   if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
     keysDown[38] = true;
   } else {
-    keysDown[38] = true;
+    keysDown[38] = false;
   }
 
 }
