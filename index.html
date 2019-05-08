@@ -241,11 +241,11 @@ var setUpKeyMap = function() {
 
 var keysDown = {};
 
-addEventListener("keydown", function (e) {
+c.addEventListener("keydown", function (e) {
 	keysDown[e.keyCode] = true;
 }, false);
 
-addEventListener("keyup", function (e) {
+c.addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
