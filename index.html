@@ -241,17 +241,15 @@ var setUpKeyMap = function() {
 
 var keysDown = {};
 
-c.addEventListener("keydown", function (e) {
+addEventListener("keydown", function (e) {
 	keysDown[e.keyCode] = true;
 }, false);
 
-c.addEventListener("keyup", function (e) {
+addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
 let processTouchStart = function(e) {
-  ctx.fillText("woop", x, y);
-  ctx.fillText(e, 10,10);
   
   let x = e.touches[0].clientX;
   let y = e.touches[0].clientY;
@@ -278,10 +276,10 @@ let processTouchEnd = function(e) {
 
 }
 
-if(mobile) {
+//if(mobile) {
   addEventListener('touchstart', processTouchStart, false);
   addEventListener('touchend', processTouchEnd, false);
-}
+//}
 
 
 var canvas = document.getElementById('c');
