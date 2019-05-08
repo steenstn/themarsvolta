@@ -340,7 +340,7 @@ let processTouchMove = function(e) {
   
 }
 let processTouchEnd = function(e) {
-  /*
+  
   var obj = c;
     var top = 0;
     var left = 0;
@@ -372,21 +372,15 @@ let processTouchEnd = function(e) {
     tx2 = x2;
     ty2 = y2;
   }
-  if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,1,(Viewport.height-80),80,80)) {
-    keysDown[37] = true;
-  } else {
+  if(!(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,1,(Viewport.height-80),80,80))) {
     keysDown[37] = false;
-  }
-  if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,85,(Viewport.height-80),80,80)) {
-    keysDown[39] = true;
-  } else {
+  } 
+  if((Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,85,(Viewport.height-80),80,80))) {
     keysDown[39] = false;
   }
-  if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
-    keysDown[38] = true;
-  } else {
+  if(!(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80))) {
     keysDown[38] = false;
-  }*/
+  } 
 
 }
 
@@ -1011,7 +1005,7 @@ var GameLoop = function(){
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
     ctx.fillStyle = "#f00";
     ctx.fillRect(tx,ty,10,10);
-    ctx.fillStyle = "#00f";
+    ctx.fillStyle = "#0f0";
     ctx.fillRect(tx2,ty2,10,10);
   }
 	gLoop = setTimeout(GameLoop, 20);
