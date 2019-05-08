@@ -240,7 +240,8 @@ var setUpKeyMap = function() {
 }
 
 var keysDown = {};
-
+let tx=0;
+let ty=0;
 addEventListener("keydown", function (e) {
 	keysDown[e.keyCode] = true;
 }, false);
@@ -262,6 +263,8 @@ let processTouchStart = function(e) {
     // return relative mouse position
     let x = e.touches[0].clientX - left + window.pageXOffset;
     let y = e.touches[0].clientY - top + window.pageYOffset;
+    tx = x;
+    ty = y;
   let x2 = x;
   let y2 = y;
   if(e.touches.length > 1) {
@@ -298,7 +301,21 @@ let processTouchEnd = function(e) {
   c.addEventListener('touchstart', processTouchStart, false);
   c.addEventListener('touchend', processTouchEnd, false);
 //}
-
+document.body.addEventListener("touchstart", function (e) {
+  if (e.target == c) {
+    e.preventDefault();
+  }
+}, false);
+document.body.addEventListener("touchend", function (e) {
+  if (e.target == c) {
+    e.preventDefault();
+  }
+}, false);
+document.body.addEventListener("touchmove", function (e) {
+  if (e.target == c) {
+    e.preventDefault();
+  }
+}, false);
 
 var canvas = document.getElementById('c');
 
@@ -912,6 +929,8 @@ var GameLoop = function(){
     ctx.fillRect(1,Viewport.height-80,80,80);
     ctx.fillRect(85,Viewport.height-80,80,80);
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(tx,ty,10,10);
   }
 	gLoop = setTimeout(GameLoop, 20);
 }
