@@ -250,6 +250,9 @@ c.addEventListener("keyup", function (e) {
 }, false);
 
 let processTouchStart = function(e) {
+  ctx.fillText("woop", x, y);
+  ctx.fillText(e, 10,10);
+  
   let x = e.touches[0].clientX;
   let y = e.touches[0].clientY;
   let x2 = x;
