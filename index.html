@@ -281,8 +281,8 @@ let processTouchStart = function(e) {
     // return relative mouse position
     x2 = e.touches[1].clientX - left + window.pageXOffset;
     y2 = e.touches[1].clientY - top + window.pageYOffset;
-    tx2 = x2/2;
-    ty2 = y2/2;
+    tx2 = x2;
+    ty2 = y2;
   }
   if(Helper.overlap(x*2,y*2,1,1,1,(Viewport.height-80)*2,80*2,80*2) || Helper.overlap(x2*2,y2*2,1,1,1,(Viewport.height-80)*2,80*2,80*2)) {
     keysDown[37] = true;
