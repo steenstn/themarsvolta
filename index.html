@@ -242,6 +242,8 @@ var setUpKeyMap = function() {
 var keysDown = {};
 let tx=0;
 let ty=0;
+let tx2 = 0;
+let ty2 = 0;
 addEventListener("keydown", function (e) {
 	keysDown[e.keyCode] = true;
 }, false);
@@ -261,10 +263,10 @@ let processTouchStart = function(e) {
     }
 
     // return relative mouse position
-    let x = e.touches[0].clientX - left + window.pageXOffset;
-    let y = e.touches[0].clientY - top + window.pageYOffset;
-    tx = x/2;
-    ty = y/2;
+    let x = e.touches[0].clientX;// - left + window.pageXOffset;
+    let y = e.touches[0].clientY;// - top + window.pageYOffset;
+    tx = x;///2;
+    ty = y;///2;
   let x2 = x;
   let y2 = y;
   if(e.touches.length > 1) {
@@ -279,7 +281,8 @@ let processTouchStart = function(e) {
     // return relative mouse position
     x2 = e.touches[1].clientX - left + window.pageXOffset;
     y2 = e.touches[1].clientY - top + window.pageYOffset;
-
+    tx2 = x2/2;
+    ty2 = y2/2;
   }
   if(Helper.overlap(x*2,y*2,1,1,1,(Viewport.height-80)*2,80*2,80*2) || Helper.overlap(x2*2,y2*2,1,1,1,(Viewport.height-80)*2,80*2,80*2)) {
     keysDown[37] = true;
@@ -917,6 +920,8 @@ var GameLoop = function(){
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
     ctx.fillStyle = "#fff";
     ctx.fillRect(tx,ty,10,10);
+    ctx.fillStyle = "#0f0";
+    ctx.fillRect(tx2,ty2,10,10);
   }
 	gLoop = setTimeout(GameLoop, 20);
 }
