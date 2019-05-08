@@ -263,8 +263,8 @@ let processTouchStart = function(e) {
     // return relative mouse position
     let x = e.touches[0].clientX - left + window.pageXOffset;
     let y = e.touches[0].clientY - top + window.pageYOffset;
-    tx = x;
-    ty = y;
+    tx = x/2;
+    ty = y/2;
   let x2 = x;
   let y2 = y;
   if(e.touches.length > 1) {
