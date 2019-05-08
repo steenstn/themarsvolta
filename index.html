@@ -104,6 +104,11 @@ GameState.christmasMode = isDecember ? true : false;
 <canvas id='c'></canvas>
 <script>
 
+let mobile = false;
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    mobile = true;
+}
+
 var debug = 0;
 var pixelBackground = 0;
 var keyHeldDown = 0;
@@ -1004,7 +1009,10 @@ ctx.textAlign = "center"
 ctx.fillText("Original music by The Mars Volta", 320, 100);
 ctx.fillText("Songs made into 8bit by Mhztransmission, taxIN7", 320, 120);
 ctx.fillText("Click me to play.", 320, 180);
-ctx.fillText("NO MOBILE SUPPORT. KEYBOARD REQUIRED", 320, 200);
+if(mobile) {
+  ctx.fillText("NO MOBILE SUPPORT. KEYBOARD REQUIRED", 320, 200);
+}
+
  
 var startGame = function() {
   jukeBox.playCurrentSong();
