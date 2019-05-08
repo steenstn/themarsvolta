@@ -242,8 +242,6 @@ var setUpKeyMap = function() {
 var keysDown = {};
 let tx=0;
 let ty=0;
-let tx2 = 0;
-let ty2 = 0;
 addEventListener("keydown", function (e) {
 	keysDown[e.keyCode] = true;
 }, false);
@@ -265,8 +263,8 @@ let processTouchStart = function(e) {
     }
 
     // return relative mouse position
-    let x = e.touches[0].clientX - left + window.pageXOffset;
-    let y = e.touches[0].clientY - top + window.pageYOffset;
+    let x = e.touches[i].clientX - left + window.pageXOffset;
+    let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
     if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
@@ -296,8 +294,8 @@ let processTouchMove = function(e) {
     }
 
     // return relative mouse position
-    let x = e.touches[0].clientX - left + window.pageXOffset;
-    let y = e.touches[0].clientY - top + window.pageYOffset;
+    let x = e.touches[i].clientX - left + window.pageXOffset;
+    let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
     if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
@@ -324,8 +322,8 @@ let processTouchEnd = function(e) {
     }
 
     // return relative mouse position
-    let x = e.touches[0].clientX - left + window.pageXOffset;
-    let y = e.touches[0].clientY - top + window.pageYOffset;
+    let x = e.touches[i].clientX - left + window.pageXOffset;
+    let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
   if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
@@ -963,7 +961,7 @@ var GameLoop = function(){
     ctx.fillRect(1,Viewport.height-80,80,80);
     ctx.fillRect(85,Viewport.height-80,80,80);
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
-    ctx.fillStyle = "#f00";
+    ctx.fillStyle = "#00f";
     ctx.fillRect(tx,ty,10,10);
   }
 	gLoop = setTimeout(GameLoop, 20);
