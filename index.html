@@ -1162,7 +1162,7 @@ if(mobile) {
  
 var startGame = function() {
   jukeBox.playCurrentSong();
-  c.removeEventListener('touchstart', startGame, false);
+  //c.removeEventListener('touchstart', startGame, false);
   
   c.addEventListener('touchstart', processTouchStart, false);
   c.addEventListener('touchend', processTouchEnd, false);
@@ -1172,7 +1172,7 @@ var startGame = function() {
   c.removeEventListener('click', startGame);
 }
 c.addEventListener('click', startGame, false);
-c.addEventListener('touchstart', startGame, false);
+//c.addEventListener('touchstart', startGame, false);
 </script>
 <br />
 </body>
