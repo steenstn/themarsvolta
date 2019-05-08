@@ -78,6 +78,12 @@ GameState.christmasMode = isDecember ? true : false;
 <script src="js/particles/TimedParticleFactory.js" type="text/javascript"></script>
 <script src="js/particles/HealthParticleFactory.js" type="text/javascript"></script>
 
+<script src="js/Box.js" type="text/javascript"></script>
+<script src="js/MovementStrategy.js" type="text/javascript"></script>
+<script src="js/CarryingMovementStrategy.js" type="text/javascript"></script>
+<script src="js/PhysicsEntity.js" type="text/javascript"></script>
+<script src="js/PhysicsMovementStrategy.js" type="text/javascript"></script>
+
 <script src="js/Helper.js" type="text/javascript"></script>
 <script src="js/Smoke.js" type="text/javascript"></script>
 
@@ -218,7 +224,7 @@ var init = function() {
   }
 
 }
-
+let box;
 var addPlayer = function(playerImage, keyLeft, keyUp, keyRight) {
   var p = new Player(0,0,playerImage);
   p.keyLeft = keyLeft;
@@ -443,10 +449,17 @@ var updateEnemies = function(i) {
 }
 
 var checkKeys = function (modifier) {
-  if(79 in keysDown) { // o
+  if(80 in keysDown) {
+    keyHeldDown++;
+    if(keyHeldDown === 1 && Helper.overlap(box.x-5,box.y-5,25,25,players[0].x,players[0].y,players[0].width,players[0].height)) {
+      box.setMovementStrategy(new CarryingMovementStrategy(players[0]));
+
+    }
+  }
+  else if(79 in keysDown) { // o
     keyHeldDown++;
     if(keyHeldDown === 1) {
-      debug = 1 - debug;
+      debug = 1 - debug;      
     }
   } else if(71 in keysDown) { // g
     keyHeldDown++;
@@ -639,6 +652,8 @@ var setUpContent = function() {
         var offset = 15;
         players[0].x = players[0].oldx = content[i].x - offset;
         players[0].y = players[0].oldy = content[i].y;
+        
+        box = new Box(players[0].x+100, players[0].y);
         if(players[1]) {
           players[1].x = players[1].oldx = content[i].x + offset;
           players[1].y = players[1].oldy = content[i].y;
@@ -709,6 +724,7 @@ var drawAllText = function() {
     }
 }
 
+
 var GameLoop = function(){
   numFramesSinceStart++;
 	clear();
@@ -763,6 +779,7 @@ var GameLoop = function(){
     for(var i = 0; i < flies.length; i++) {
       flies[i].move(players, flowers);
     }
+    box.move();
   }
 
   renderEnemies();
@@ -846,6 +863,8 @@ var GameLoop = function(){
       GameState.animating=2;
       bedlam = new Bedlam();
   }
+
+  box.render(ctx);
   
   GUIRenderables.forEach((g) => g.render(ctx));
 
