@@ -1161,6 +1161,7 @@ if(mobile) {
 
  
 var startGame = function() {
+  jukeBox.playCurrentSong();
   c.removeEventListener('touchstart', startGame, false);
   
   c.addEventListener('touchstart', processTouchStart, false);
