@@ -253,7 +253,8 @@ addEventListener("keyup", function (e) {
 }, false);
 
 let processTouchStart = function(e) {
-  var obj = c;
+  for(let i = 0; i < e.touches.length; i++) {
+    var obj = c;
     var top = 0;
     var left = 0;
     while (obj && obj.tagName != 'BODY') {
@@ -267,37 +268,23 @@ let processTouchStart = function(e) {
     let y = e.touches[0].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-  let x2 = x;
-  let y2 = y;
-  if(e.touches.length > 1) {
-    let top = 0;
-    let left = 0;
-    while (obj && obj.tagName != 'BODY') {
-        top += obj.offsetTop;
-        left += obj.offsetLeft;
-        obj = obj.offsetParent;
+    if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+      keysDown[37] = true;
     }
-
-    // return relative mouse position
-    x2 = e.touches[1].clientX - left + window.pageXOffset;
-    y2 = e.touches[1].clientY - top + window.pageYOffset;
-    tx2 = x2;
-    ty2 = y2;
+    if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+      keysDown[39] = true;
+    }
+    if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+      keysDown[38] = true;
+    }
   }
-  if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,1,(Viewport.height-80),80,80)) {
-    keysDown[37] = true;
-  }
-  if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,85,(Viewport.height-80),80,80)) {
-    keysDown[39] = true;
-  }
-  if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
-    keysDown[38] = true;
-  }
+    
   
 }
 
 let processTouchMove = function(e) {
-  var obj = c;
+  for(let i = 0; i < e.touches.length; i++) {
+    var obj = c;
     var top = 0;
     var left = 0;
     while (obj && obj.tagName != 'BODY') {
@@ -311,37 +298,21 @@ let processTouchMove = function(e) {
     let y = e.touches[0].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-  let x2 = x;
-  let y2 = y;
-  if(e.touches.length > 1) {
-    let top = 0;
-    let left = 0;
-    while (obj && obj.tagName != 'BODY') {
-        top += obj.offsetTop;
-        left += obj.offsetLeft;
-        obj = obj.offsetParent;
+    if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+      keysDown[37] = true;
     }
-
-    // return relative mouse position
-    x2 = e.touches[1].clientX - left + window.pageXOffset;
-    y2 = e.touches[1].clientY - top + window.pageYOffset;
-    tx2 = x2;
-    ty2 = y2;
-  }
-  if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,1,(Viewport.height-80),80,80)) {
-    keysDown[37] = true;
-  }
-  if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,85,(Viewport.height-80),80,80)) {
-    keysDown[39] = true;
-  }
-  if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
-    keysDown[38] = true;
-  }
+    if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+      keysDown[39] = true;
+    }
+    if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+      keysDown[38] = true;
+    }
+  }  
   
 }
 let processTouchEnd = function(e) {
-  
-  var obj = c;
+  for(let i = 0; i < e.touches.length; i++) {
+    var obj = c;
     var top = 0;
     var left = 0;
     while (obj && obj.tagName != 'BODY') {
@@ -355,32 +326,18 @@ let processTouchEnd = function(e) {
     let y = e.touches[0].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-  let x2 = x;
-  let y2 = y;
-  if(e.touches.length > 1) {
-    let top = 0;
-    let left = 0;
-    while (obj && obj.tagName != 'BODY') {
-        top += obj.offsetTop;
-        left += obj.offsetLeft;
-        obj = obj.offsetParent;
-    }
+  if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+    delete keysDown[37];
+  } 
+  if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+    delete keysDown[39];
+  }
+  if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+    delete keysDown[38];
+  } 
 
-    // return relative mouse position
-    x2 = e.touches[1].clientX - left + window.pageXOffset;
-    y2 = e.touches[1].clientY - top + window.pageYOffset;
-    tx2 = x2;
-    ty2 = y2;
   }
-  if(!(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,1,(Viewport.height-80),80,80))) {
-    keysDown[37] = false;
-  } 
-  if((Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,85,(Viewport.height-80),80,80))) {
-    keysDown[39] = false;
-  }
-  if(!(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80) || Helper.overlap(x2,y2,1,1,(Viewport.width-80),(Viewport.height-80),80,80))) {
-    keysDown[38] = false;
-  } 
+    
 
 }
 
@@ -1003,7 +960,7 @@ var GameLoop = function(){
     ctx.fillRect(1,Viewport.height-80,80,80);
     ctx.fillRect(85,Viewport.height-80,80,80);
     ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
-    ctx.fillStyle = "#f00";
+    ctx.fillStyle = "#ff0";
     ctx.fillRect(tx,ty,10,10);
     ctx.fillStyle = "#0f0";
     ctx.fillRect(tx2,ty2,10,10);
