@@ -123,6 +123,7 @@ if (/Mobi|Android/i.test(navigator.userAgent)) {
 } else {
   c.style.transform = "scale(2)";
 }
+let touchControllerSize = 100;
 var totalNumVinylCollected = 0;
 
 var vinylCollectedInLevel = 0;
@@ -271,13 +272,13 @@ let processTouchStart = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-    if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,1,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[37] = true;
     }
-    if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,touchControllerSize+10,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[39] = true;
     }
-    if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,(Viewport.width-touchControllerSize),(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[38] = true;
     }
   }
@@ -304,13 +305,13 @@ let processTouchMove = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[37];
     } 
-    if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,touchControllerSize+10,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[39];
     }
-    if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,(Viewport.width-touchControllerSize),(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[38];
     }
 
@@ -331,13 +332,13 @@ let processTouchMove = function(e) {
     tx = x;
     ty = y;
 
-    if(Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,1,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[37] = true;
     } 
-    if(Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,touchControllerSize+10,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[39] = true;
     }
-    if(Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+    if(Helper.overlap(x,y,1,1,(Viewport.width-touchControllerSize),(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       keysDown[38] = true;
     }
   }   
@@ -364,13 +365,13 @@ let processTouchEnd = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     tx = x;
     ty = y;
-    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,1,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[37];
     } 
-    if(!Helper.overlap(x,y,1,1,85,(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,touchControllerSize+10,(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[39];
     }
-    if(!Helper.overlap(x,y,1,1,(Viewport.width-80),(Viewport.height-80),80,80)) {
+    if(!Helper.overlap(x,y,1,1,(Viewport.width-touchControllerSize),(Viewport.height-touchControllerSize),touchControllerSize,touchControllerSize)) {
       delete keysDown[38];
     } 
 
@@ -992,9 +993,9 @@ var GameLoop = function(){
 	drawAllText();
   if(mobile) {
     ctx.fillStyle= "rgba(255,255,255,0.4)";
-    ctx.fillRect(1,Viewport.height-80,80,80);
-    ctx.fillRect(85,Viewport.height-80,80,80);
-    ctx.fillRect(Viewport.width-80,Viewport.height-80,80,80);
+    ctx.fillRect(1,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
+    ctx.fillRect(touchControllerSize+10,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
+    ctx.fillRect(Viewport.width-touchControllerSize,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
   }
 	gLoop = setTimeout(GameLoop, 20);
 }
