@@ -1030,6 +1030,12 @@ let processIntroScreenTouch = function(e) {
     
   }   
 }
+let startMusicEventHandler = function(e) {
+  e.preventDefault();
+  if(!jukeBox.isSongPlaying()) {
+    jukeBox.playCurrentSong();
+  }
+}
 var IntroScreen = function() {
     numFramesSinceStart++;
     clearBlack();
@@ -1110,6 +1116,8 @@ var IntroScreen = function() {
       
       if(32 in keysDown || 13 in keysDown) {
         if(mobile) {
+          c.addEventListener('click', startMusicEventHandler, false);
+          c.removeEventListener('ontouchstart', processIntroScreenTouch);
           GUIRenderables.push(touchControllerLeft);
           GUIRenderables.push(touchControllerRight);
           GUIRenderables.push(touchControllerJump);
