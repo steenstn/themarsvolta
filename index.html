@@ -971,7 +971,15 @@ var GameLoop = function(){
   }
   
   GUIRenderables.forEach((g) => g.render(ctx));
+  if(mobile) {
+    ctx.fillStyle = "#afafaf";
+    ctx.font = '80px Verdana';
 
+    ctx.fillText("<", touchControllerLeft.x+touchControllerLeft.width/6.5, touchControllerLeft.y+touchControllerLeft.height/1.4);
+    ctx.fillText(">", touchControllerRight.x+touchControllerRight.width/6.5, touchControllerRight.y+touchControllerRight.height/1.4);
+    ctx.fillText("^", touchControllerJump.x+touchControllerJump.width/6.4, touchControllerJump.y+touchControllerJump.height/1.15);
+    
+  }
   ctx.drawImage(Level.tileset, 64, 128, 32, 32, mobile ? Viewport.width/2-32 : 4, Viewport.height-35, 32, 32);
 	drawAllText();
 	gLoop = setTimeout(GameLoop, 20);
