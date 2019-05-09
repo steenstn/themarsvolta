@@ -279,6 +279,7 @@ let processTouchStart = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     allTouchControllers.forEach(tc => {
       if(Helper.overlap(x,y,1,1,tc.x,tc.y,tc.width,tc.height)) {
+        tc.activate();
         keysDown[tc.keyCode] = true;
       }
     });
@@ -305,6 +306,7 @@ let processTouchMove = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     allTouchControllers.forEach(tc => {
       if(!Helper.overlap(x,y,1,1,tc.x,tc.y,tc.width,tc.height)) {
+        tc.deactivate();
         delete keysDown[tc.keyCode];
       }
     });
@@ -326,6 +328,7 @@ let processTouchMove = function(e) {
 
     allTouchControllers.forEach(tc => {
       if(Helper.overlap(x,y,1,1,tc.x,tc.y,tc.width,tc.height)) {
+        tc.activate();
         keysDown[tc.keyCode] = true;
       }
     });
@@ -337,6 +340,7 @@ let processTouchEnd = function(e) {
   
   if(e.touches.length === 0) {
     keysDown = [];
+    allTouchControllers.forEach(t => t.deactivate());
   }
   for(let i = 0; i < e.touches.length; i++) {
     var obj = c;
@@ -353,6 +357,7 @@ let processTouchEnd = function(e) {
     let y = e.touches[i].clientY - top + window.pageYOffset;
     allTouchControllers.forEach(tc => {
       if(!Helper.overlap(x,y,1,1,tc.x,tc.y,tc.width,tc.height)) {
+        tc.deactivate();
         delete keysDown[tc.keyCode];
       }
     });
@@ -968,12 +973,6 @@ var GameLoop = function(){
 
   ctx.drawImage(Level.tileset, 64, 128, 32, 32, mobile ? Viewport.width/2-32 : 4, Viewport.height-35, 32, 32);
 	drawAllText();
-  /*if(mobile) {
-    ctx.fillStyle= "rgba(255,255,255,0.4)";
-    ctx.fillRect(1,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
-    ctx.fillRect(touchControllerSize+10,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
-    ctx.fillRect(Viewport.width-touchControllerSize,Viewport.height-touchControllerSize,touchControllerSize,touchControllerSize);
-  }*/
 	gLoop = setTimeout(GameLoop, 20);
 }
 
