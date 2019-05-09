@@ -133,7 +133,6 @@ let touchControllerJump = new TouchController(Viewport.width-100,Viewport.height
 
 let allTouchControllers = [touchControllerLeft, touchControllerRight, touchControllerJump];
 
-let touchControllerSize = 100;
 var totalNumVinylCollected = 0;
 
 var vinylCollectedInLevel = 0;
@@ -1000,7 +999,37 @@ var cleanSmoke = function() {
 }
 
 var selectedOption = 0;
+let processIntroScreenTouch = function(e) {
+  e.preventDefault();
+  for(let i = 0; i < e.touches.length; i++) {
+    var obj = c;
+    var top = 0;
+    var left = 0;
+    while (obj && obj.tagName != 'BODY') {
+        top += obj.offsetTop;
+        left += obj.offsetLeft;
+        obj = obj.offsetParent;
+    }
 
+    // return relative mouse position
+    let x = e.touches[i].clientX - left + window.pageXOffset;
+    let y = e.touches[i].clientY - top + window.pageYOffset;
+    //cedric
+    //ctx.strokeRect(190,230,88,25);
+    if(Helper.overlap(x-10,y-10,20,20,190,230,88,25)) {
+      selectedOption = 0;
+      keysDown[32]= true;
+    }
+    else if(Helper.overlap(x-10,y-10,20,20,348,230,88,25)) {
+      selectedOption = 1;
+      keysDown[32] = true;
+    }
+//omar
+
+     ///   ctx.strokeRect(348,230,88,25);
+    
+  }   
+}
 var IntroScreen = function() {
     numFramesSinceStart++;
     clearBlack();
@@ -1027,14 +1056,41 @@ var IntroScreen = function() {
       ctx.fillStyle    = '#F00';
       ctx.font         = '12px Verdana';
 
+      if(mobile) {
+        ctx.textAlign = 'left';
+        ctx.fillStyle    = '#fff';
+        ctx.fillText("MOBILE VERSION", 2,15);
+        
+        ctx.textAlign = 'center';
+        ctx.fillStyle    = '#f44';
+        ctx.fillText  ("CHOOSE CHARACTER", 320,220);
+        
+        ctx.font         = '18px Verdana';
+        ctx.strokeStyle = "#f44"
+        ctx.strokeRect(190,230,88,25);
+        ctx.fillText  ("CEDRIC", 235,250);
+        ctx.strokeRect(348,230,88,25);
+        ctx.fillText  ("OMAR", 390,250);
+
+        ctx.fillStyle    = '#FFF';
+        ctx.textAlign = 'center';
+        if(numFramesSinceStart%60<40) {
+          ctx.fillText  ("Play on computer to access 2 player mode", 320,280);
+        }
+        
+
+        
+
+      } else {
+        ctx.textAlign = 'left';
+        ctx.fillStyle = selectedOption === 0 ? "#0F0" : "#F00";
+        ctx.fillText  ("1 PLAYER GAME (CEDRIC)", 235,230);
+        ctx.fillStyle = selectedOption === 1 ? "#0F0" : "#F00";
+        ctx.fillText  ("1 PLAYER GAME (OMAR)", 235,250);
+        ctx.fillStyle = selectedOption === 2 ? "#0F0" : "#F00";
+        ctx.fillText  ("2 PLAYER GAME (CEDRIC + OMAR)", 235,270);
       
-      ctx.textAlign = 'left';
-      ctx.fillStyle = selectedOption === 0 ? "#0F0" : "#F00";
-      ctx.fillText  ("1 PLAYER GAME (CEDRIC)", 235,230);
-      ctx.fillStyle = selectedOption === 1 ? "#0F0" : "#F00";
-      ctx.fillText  ("1 PLAYER GAME (OMAR)", 235,250);
-      ctx.fillStyle = selectedOption === 2 ? "#0F0" : "#F00";
-      ctx.fillText  ("2 PLAYER GAME (CEDRIC + OMAR)", 235,270);
+      }
       
       if(40 in keysDown) {
         keyHeldDown++;
@@ -1049,13 +1105,20 @@ var IntroScreen = function() {
       } else {
           keyHeldDown = 0;
       }
-      if(mobile) {
-        selectedOption = 0;
-        GUIRenderables.push(touchControllerLeft);
-        GUIRenderables.push(touchControllerRight);
-        GUIRenderables.push(touchControllerJump);
-      }
-      if(32 in keysDown || 13 in keysDown || mobile) {
+
+
+      
+      if(32 in keysDown || 13 in keysDown) {
+        if(mobile) {
+          GUIRenderables.push(touchControllerLeft);
+          GUIRenderables.push(touchControllerRight);
+          GUIRenderables.push(touchControllerJump);
+        }
+        c.removeEventListener('touchstart', processIntroScreenTouch);
+        c.addEventListener('touchstart', processTouchStart, false);
+        c.addEventListener('touchend', processTouchEnd, false);
+        c.addEventListener('touchmove', processTouchMove, false);
+        c.addEventListener('touchcancel', processTouchEnd, false);
         if(selectedOption===0) {
           addPlayer(image2, 37, 38, 39)
         } else if(selectedOption===1) {
@@ -1133,20 +1196,16 @@ ctx.textAlign = "center"
 ctx.fillText("Original music by The Mars Volta", 320, 100);
 ctx.fillText("Songs made into 8bit by Mhztransmission, taxIN7", 320, 140);
 ctx.fillText("Click me to play.", 320, 180);
-if(mobile) {
-  ctx.fillText("MOBILE DEVICE: Only 1 player available", 320, 220);
-  ctx.fillText("Play on computer for 2 player mode", 320, 245);
-}
 
  
 var startGame = function() {
   jukeBox.playCurrentSong();
   //c.removeEventListener('touchstart', startGame, false);
   
-  c.addEventListener('touchstart', processTouchStart, false);
-  c.addEventListener('touchend', processTouchEnd, false);
-  c.addEventListener('touchmove', processTouchMove, false);
-  c.addEventListener('touchcancel', processTouchEnd, false);
+  if(mobile) {
+    c.addEventListener('touchstart', processIntroScreenTouch, false);
+  }
+  
   IntroScreen();
   c.removeEventListener('click', startGame);
 }
